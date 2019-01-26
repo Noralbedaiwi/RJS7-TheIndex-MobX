@@ -4,6 +4,8 @@ import axios from "axios";
 // Components
 import BookTable from "./BookTable";
 import Loading from "./Loading";
+import BookStore from "./stores/BookStore";
+import authorStore from "./stores/AuthorStore";
 
 const instance = axios.create({
   baseURL: "https://the-index-api.herokuapp.com"
@@ -39,6 +41,9 @@ class AuthorDetail extends Component {
   }
 
   render() {
+    const authorID = this.props.match.params.authorID;
+    const author = authorStore.getAuthorById(authorID);
+    const books = author.books.map(bookID => BookStore.getBookById);
     if (this.state.loading) {
       return <Loading />;
     } else {

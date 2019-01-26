@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { observer } from "mobx-react";
+
+import BookStore from "./stores/BookStore";
 
 // Components
 import Loading from "./Loading";
@@ -12,38 +15,13 @@ const instance = axios.create({
 });
 
 class BookList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      books: [],
-      loading: true
-    };
-  }
-
-  componentDidMount() {
-    instance
-      .get("https://the-index-api.herokuapp.com/api/books/")
-      .then(res => res.data)
-      .then(books =>
-        this.setState({
-          books,
-          loading: false
-        })
-      )
-      .catch(err => console.error(err));
-  }
-
-  filterBooksByColor(bookColor) {
-    return this.state.books.filter(book => book.color === bookColor);
-  }
-
   render() {
     const bookColor = this.props.match.params.bookColor;
-    let books = this.state.books;
+    let books = BookStore.books;
     let allBooksButton;
 
     if (bookColor) {
-      books = this.filterBooksByColor(bookColor);
+      books = BookStore.filterBooksByColor(bookColor);
       allBooksButton = (
         <Link to="/books">
           <button className="btn">All Books</button>
@@ -51,12 +29,10 @@ class BookList extends Component {
       );
     }
 
-    return this.state.loading ? (
-      <Loading />
-    ) : (
+    return (
       <div>
         <h3>Books</h3>
-        <SearchBar store={{}} />
+        <SearchBar store={{ BookStore }} />
         {allBooksButton}
         <BookTable books={books} />
       </div>
@@ -64,4 +40,4 @@ class BookList extends Component {
   }
 }
 
-export default BookList;
+export default observer(BookList);
